@@ -6,7 +6,8 @@ $current = 'admin';
 $action = $_GET['action'] ?? '';
 $userId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
-if ($action === 'block' && $userId) {
+if ($action === 'block' && $userId && is_post()) {
+  csrf_validate();
   admin_user_toggle_block($userId);
   flash_set('ok', 'Статус пользователя изменён.');
   redirect('admin-users');

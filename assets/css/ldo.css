@@ -157,3 +157,31 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .chart-year-nav button{background:transparent;border:var(--border);color:var(--text);padding:6px 12px;border-radius:8px;cursor:pointer}
 .chart-year-nav button:hover{background:rgba(255,255,255,.05)}
 .chart-svg{width:100%;height:280px;overflow:visible}
+
+
+/* Accessibility */
+a:focus-visible,
+button:focus-visible,
+.btn:focus-visible,
+.nav-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Utilities */
+.page-head { margin: 0 0 8px 0; }
+.page-subtitle { margin-bottom: 24px; }
+.section-spacer { margin-top: 24px; }
+.action-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.list-ideas { margin: 0; padding-left: 18px; line-height: 1.8; }
+.toggle-row { margin-bottom: 24px; }
+.table-wrap { width: 100%; overflow-x: auto; }
+.table-wrap table { min-width: 680px; }
+
+@media (max-width: 720px) {
+  .container { padding: 16px; }
+  .kpi .item { min-width: 140px; }
+}
+
+.is-hidden{display:none!important}

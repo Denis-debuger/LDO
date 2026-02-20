@@ -49,6 +49,7 @@ require_once __DIR__ . '/lib/article_media.php';
 require_once __DIR__ . '/lib/statistics.php';
 require_once __DIR__ . '/lib/food.php';
 require_once __DIR__ . '/lib/password_reset.php';
+require_once __DIR__ . '/lib/captcha.php';
 
 // Ensure CSRF token exists for forms.
 csrf_token();
