@@ -1,12 +1,12 @@
 <div class="container">
-  <h1 style="margin:0 0 8px 0">Дневник тренировок</h1>
-  <p class="muted" style="margin-bottom:24px">Фиксируйте тренировки и упражнения</p>
+  <h1 class="page-head">Дневник тренировок</h1>
+  <p class="muted page-subtitle">Фиксируйте тренировки и упражнения</p>
 
-  <div style="margin-bottom:24px">
-    <button type="button" class="btn btn-primary" onclick="document.getElementById('diary-add-form').classList.toggle('hide')">+ Добавить тренировку</button>
+  <div class="toggle-row">
+    <button type="button" class="btn btn-primary" onclick="document.getElementById('diary-add-form').classList.toggle('is-hidden')">+ Добавить тренировку</button>
   </div>
 
-  <div id="diary-add-form" class="card card-accent hide" style="margin-bottom:24px">
+  <div id="diary-add-form" class="card card-accent is-hidden" style="margin-bottom:24px">
     <div class="card-body">
       <h2 class="card-title">Новая тренировка</h2>
       <form method="post" action="<?= url('diary-add') ?>" class="form">
@@ -34,7 +34,8 @@
   </div>
   <?php else: ?>
   <div class="card">
-    <table>
+    <div class="table-wrap">
+      <table>
       <thead>
         <tr>
           <th>Дата</th>
@@ -55,9 +56,9 @@
         </tr>
         <?php endforeach; ?>
       </tbody>
-    </table>
+      </table>
+    </div>
   </div>
   <?php endif; ?>
 </div>
 
-<style>.hide{display:none!important}</style>
