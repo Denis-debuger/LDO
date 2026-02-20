@@ -8,12 +8,21 @@ if (is_logged_in()) {
 $pageTitle = 'Регистрация';
 $current = '';
 $error = null;
+$captchaKey = 'register';
 
 if (is_post()) {
   csrf_validate();
   $email = (string)($_POST['email'] ?? '');
   $password = (string)($_POST['password'] ?? '');
   $password2 = (string)($_POST['password2'] ?? '');
+  $captchaValue = (string)($_POST['captcha'] ?? '');
+
+  if (!captcha_validate($captchaKey, $captchaValue)) {
+    $error = 'Неверно решена CAPTCHA.';
+    $captchaQuestion = captcha_generate($captchaKey);
+    render('auth/register', compact('pageTitle', 'current', 'error', 'captchaQuestion'));
+    return;
+  }
   if ($password !== $password2) {
     $error = 'Пароли не совпадают.';
   } else {
@@ -27,4 +36,5 @@ if (is_post()) {
   }
 }
 
-render('auth/register', compact('pageTitle', 'current', 'error'));
+$captchaQuestion = captcha_question($captchaKey);
+render('auth/register', compact('pageTitle', 'current', 'error', 'captchaQuestion'));

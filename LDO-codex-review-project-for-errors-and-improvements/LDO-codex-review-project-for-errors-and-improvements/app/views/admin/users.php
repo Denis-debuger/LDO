@@ -5,7 +5,8 @@
   </div>
 
   <div class="card">
-    <table>
+    <div class="table-wrap">
+      <table>
       <thead>
         <tr>
           <th>ID</th>
@@ -30,7 +31,10 @@
           <td><?= $u['is_blocked'] ? '<span style="color:var(--danger)">Заблокирован</span>' : '<span style="color:var(--ok)">Активен</span>' ?></td>
           <td class="muted"><?= e($u['created_at']) ?></td>
           <td>
-            <a href="<?= url('admin-users', ['action' => 'block', 'id' => $u['id']]) ?>" class="btn btn-ghost" style="padding:4px 8px;font-size:12px"><?= $u['is_blocked'] ? 'Разблокировать' : 'Заблокировать' ?></a>
+            <form method="post" action="<?= url('admin-users', ['action' => 'block', 'id' => $u['id']]) ?>" style="display:inline">
+              <?= csrf_field() ?>
+              <button type="submit" class="btn btn-ghost" style="padding:4px 8px;font-size:12px"><?= $u['is_blocked'] ? 'Разблокировать' : 'Заблокировать' ?></button>
+            </form>
             <?php if ($u['role'] !== 'admin'): ?>
             <form method="post" action="<?= url('admin-users', ['action' => 'delete', 'id' => $u['id']]) ?>" style="display:inline" onsubmit="return confirm('Удалить пользователя?')">
               <?= csrf_field() ?>
@@ -41,6 +45,7 @@
         </tr>
         <?php endforeach; ?>
       </tbody>
-    </table>
+      </table>
+    </div>
   </div>
 </div>

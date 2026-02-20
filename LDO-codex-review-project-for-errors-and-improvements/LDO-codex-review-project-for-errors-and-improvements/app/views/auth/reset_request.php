@@ -11,6 +11,11 @@
           Email
           <input type="email" name="email" required placeholder="user@example.com" value="<?= e($_POST['email'] ?? '') ?>">
         </label>
+
+        <label>
+          CAPTCHA: <?= e($captchaQuestion ?? '') ?>
+          <input type="text" name="captcha" required inputmode="numeric" placeholder="Введите ответ">
+        </label>
         <button type="submit" class="btn btn-primary">Отправить ссылку</button>
       </form>
       <?php if (defined('DEV_SHOW_RESET_LINK') && DEV_SHOW_RESET_LINK && ($resetLink ?? null)): ?>

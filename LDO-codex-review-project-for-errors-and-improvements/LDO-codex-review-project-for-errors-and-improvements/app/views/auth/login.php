@@ -16,6 +16,11 @@
           Пароль
           <input type="password" name="password" required autocomplete="current-password" minlength="8" placeholder="Минимум 8 символов">
         </label>
+
+        <label>
+          CAPTCHA: <?= e($captchaQuestion ?? '') ?>
+          <input type="text" name="captcha" required inputmode="numeric" placeholder="Введите ответ">
+        </label>
         <div style="display:flex;gap:10px;flex-wrap:wrap">
           <button type="submit" class="btn btn-primary">Войти</button>
           <a href="<?= url('password-reset') ?>" class="btn btn-ghost">Забыли пароль?</a>

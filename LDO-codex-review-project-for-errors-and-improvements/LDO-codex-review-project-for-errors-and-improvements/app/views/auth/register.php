@@ -20,6 +20,11 @@
           Повторите пароль
           <input type="password" name="password2" required autocomplete="new-password" minlength="8">
         </label>
+
+        <label>
+          CAPTCHA: <?= e($captchaQuestion ?? '') ?>
+          <input type="text" name="captcha" required inputmode="numeric" placeholder="Введите ответ">
+        </label>
         <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
       </form>
       <p class="muted" style="margin-top:16px;font-size:14px">
