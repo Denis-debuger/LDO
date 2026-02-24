@@ -1,34 +1,65 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { lazy, Suspense, useMemo, useState } from 'react'
 import './App.css'
 
+const pages = {
+  home: lazy(() => import('./pages/HomePage.jsx')),
+  diary: lazy(() => import('./pages/DiaryPage.jsx')),
+  progress: lazy(() => import('./pages/ProgressPage.jsx')),
+}
+
+const pageMeta = {
+  home: {
+    title: 'Главная',
+    subtitle: 'Добро пожаловать в LDO — персонального помощника по фитнесу.',
+  },
+  diary: {
+    title: 'Дневник',
+    subtitle: 'Записывайте тренировки и питание с мгновенной статистикой.',
+  },
+  progress: {
+    title: 'Прогресс',
+    subtitle: 'Следите за динамикой, чтобы не терять мотивацию.',
+  },
+}
+
+function PageLoader() {
+  return (
+    <div className="page-loader" role="status" aria-live="polite">
+      <div className="spinner" />
+      <p>Подгружаем страницу…</p>
+    </div>
+  )
+}
+
 function App() {
-  const [count, setCount] = useState(0)
+  const [activePage, setActivePage] = useState('home')
+  const ActivePage = useMemo(() => pages[activePage], [activePage])
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <div className="app-shell">
+      <header className="hero">
+        <h1>{pageMeta[activePage].title}</h1>
+        <p>{pageMeta[activePage].subtitle}</p>
+      </header>
+
+      <nav className="nav-grid" aria-label="Навигация по разделам">
+        {Object.keys(pages).map((key) => (
+          <button
+            key={key}
+            className={`nav-button ${activePage === key ? 'active' : ''}`}
+            onClick={() => setActivePage(key)}
+          >
+            {pageMeta[key].title}
+          </button>
+        ))}
+      </nav>
+
+      <main className="page-frame">
+        <Suspense fallback={<PageLoader />}>
+          <ActivePage />
+        </Suspense>
+      </main>
+    </div>
   )
 }
 
