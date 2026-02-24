@@ -1,6 +1,9 @@
 <div class="container">
   <h1 class="page-head">Модерация комментариев и UGC</h1>
   <p class="muted page-subtitle">Проверка пользовательского контента перед публикацией.</p>
+  <?php if (!($moderationReady ?? true)): ?>
+  <div class="flash err" style="margin-bottom:12px">Таблица <code>moderation_items</code> не найдена. Выполните миграцию <code>db/migrations/004_admin_security_moderation.sql</code>.</div>
+  <?php endif; ?>
   <div class="table-wrap card"><div class="card-body">
     <table>
       <thead><tr><th>ID</th><th>Тип</th><th>Пользователь</th><th>Контент</th><th>Статус</th><th>Действие</th></tr></thead>
