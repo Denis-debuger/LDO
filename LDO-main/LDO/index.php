@@ -2,6 +2,9 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/app/bootstrap.php';
+require_once __DIR__ . '/app/symfony_bridge.php';
+
+symfony_bridge_handle_if_enabled();
 
 $route = trim((string)($_GET['r'] ?? ''));
 if ($route === '') $route = 'home';
@@ -35,6 +38,10 @@ $routes = [
   'admin-articles' => ['handler' => 'admin_articles', 'auth' => 'admin'],
   'admin-article-edit' => ['handler' => 'admin_article_edit', 'auth' => 'admin'],
   'admin-article-add' => ['handler' => 'admin_article_add', 'auth' => 'admin'],
+  'admin-moderation' => ['handler' => 'admin_moderation', 'auth' => 'admin'],
+  'admin-security' => ['handler' => 'admin_security', 'auth' => 'admin'],
+  'admin-food' => ['handler' => 'admin_food', 'auth' => 'admin'],
+  'admin-maintenance' => ['handler' => 'admin_maintenance', 'auth' => 'admin'],
 ];
 
 if (!isset($routes[$route])) {

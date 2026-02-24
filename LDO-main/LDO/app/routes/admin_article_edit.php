@@ -52,6 +52,7 @@ if (is_post()) {
   
   if (!$error && $title && $body) {
     admin_article_update($id, $title, $slug, $categoryId, $excerpt ?: null, $body, $coverImage, $videoUrl, $published);
+    admin_audit_log('article_update', 'articles', $id);
     flash_set('ok', 'Статья обновлена.');
     redirect('admin-articles');
   } elseif (!$error) {

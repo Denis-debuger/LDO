@@ -35,7 +35,8 @@ if (is_post()) {
   
   if (!$error && $title && $body) {
     try {
-      admin_article_add($title, $slug, $categoryId, $excerpt ?: null, $body, $coverImage, $videoUrl, $published);
+      $newId = admin_article_add($title, $slug, $categoryId, $excerpt ?: null, $body, $coverImage, $videoUrl, $published);
+      admin_audit_log('article_add', 'articles', $newId);
       flash_set('ok', 'Статья добавлена.');
       redirect('admin-articles');
     } catch (PDOException $e) {

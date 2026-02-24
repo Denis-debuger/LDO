@@ -151,6 +151,9 @@
   <div class="grid grid-2">
     <div class="card card-accent">
       <div class="card-body">
+        <div id="profile-react-tabs" class="react-tabs-shell"></div>
+
+        <section data-tab-panel="avatar">
         <h2 class="card-title">Аватар</h2>
         <?php $avatarUrl = ($profile['avatar_url'] ?? null) ? upload_url($profile['avatar_url']) : null; ?>
         <?php if ($avatarUrl): ?>
@@ -171,6 +174,15 @@
           </label>
           <button type="submit" class="btn btn-primary">Загрузить</button>
         </form>
+        </section>
+
+        <section data-tab-panel="files" class="is-hidden">
+          <h2 class="card-title">Кастомная загрузка файлов</h2>
+          <p class="muted" style="margin-bottom:10px">ReactJS-виджет локально показывает выбранные файлы и подгружает список по частям.</p>
+          <div id="react-file-loader"></div>
+        </section>
+
+        <section data-tab-panel="profile" class="is-hidden">
         <h2 class="card-title">Мои данные</h2>
         <form method="post" action="<?= url('profile') ?>" class="form">
           <?= csrf_field() ?>
@@ -218,6 +230,7 @@
           </label>
           <button type="submit" class="btn btn-primary">Сохранить</button>
         </form>
+        </section>
       </div>
     </div>
 
