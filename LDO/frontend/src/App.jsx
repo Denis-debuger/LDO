@@ -37,10 +37,27 @@ function App() {
 
   return (
     <div className="app-shell">
+      <div className="release-badge">LDO UI v2 · Новый дизайн и подгрузка страниц</div>
+
       <header className="hero">
         <h1>{pageMeta[activePage].title}</h1>
         <p>{pageMeta[activePage].subtitle}</p>
       </header>
+
+      <section className="quick-stats" aria-label="Краткие показатели">
+        <article>
+          <strong>3</strong>
+          <span>раздела с lazy load</span>
+        </article>
+        <article>
+          <strong>2</strong>
+          <span>типа загрузки (spinner + skeleton)</span>
+        </article>
+        <article>
+          <strong>100%</strong>
+          <span>адаптивная навигация</span>
+        </article>
+      </section>
 
       <nav className="nav-grid" aria-label="Навигация по разделам">
         {Object.keys(pages).map((key) => (
