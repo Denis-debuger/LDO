@@ -14,6 +14,7 @@ if ($action === 'delete' && $id && is_post()) {
     article_media_delete($article['video_url'] ?? null);
   }
   if (admin_article_delete($id)) {
+    admin_audit_log('article_delete', 'articles', $id);
     flash_set('ok', 'Статья удалена.');
   }
   redirect('admin-articles');

@@ -11,6 +11,7 @@ $ok = null;
 if ($action === 'delete' && $id && is_post()) {
   csrf_validate();
   if (admin_program_delete($id)) {
+    admin_audit_log('program_delete', 'workout_programs', $id);
     flash_set('ok', 'Программа удалена.');
   }
   redirect('admin-programs');
@@ -26,10 +27,12 @@ if (is_post() && ($action === 'add' || ($action === 'edit' && $id))) {
     $error = 'Название обязательно.';
   } else {
     if ($action === 'add') {
-      admin_program_add($name, $level, $description ?: null);
+      $newId = admin_program_add($name, $level, $description ?: null);
+      admin_audit_log('program_add', 'workout_programs', $newId);
       $ok = 'Программа добавлена.';
     } else {
       admin_program_update($id, $name, $level, $description ?: null);
+      admin_audit_log('program_update', 'workout_programs', $id);
       $ok = 'Программа обновлена.';
     }
   }

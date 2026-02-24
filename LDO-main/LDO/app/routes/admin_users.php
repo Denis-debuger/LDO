@@ -9,12 +9,14 @@ $userId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 if ($action === 'block' && $userId && is_post()) {
   csrf_validate();
   admin_user_toggle_block($userId);
+  admin_audit_log('user_toggle_block', 'users', $userId);
   flash_set('ok', 'Статус пользователя изменён.');
   redirect('admin-users');
 }
 if ($action === 'delete' && $userId && is_post()) {
   csrf_validate();
   if (admin_user_delete($userId)) {
+    admin_audit_log('user_delete', 'users', $userId);
     flash_set('ok', 'Пользователь удалён.');
   }
   redirect('admin-users');

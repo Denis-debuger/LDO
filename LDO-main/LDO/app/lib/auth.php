@@ -96,12 +96,13 @@ function auth_attempt(string $email, string $password): array
   if (!valid_email($email)) return ['ok' => false, 'error' => 'Некорректный email.'];
 
   $user = user_by_email($email);
-  if (!$user) return ['ok' => false, 'error' => 'Неверный email или пароль.'];
+  if (!$user) { security_event('login_failed', null, $email); return ['ok' => false, 'error' => 'Неверный email или пароль.']; }
 
-  if (!empty($user['is_blocked'])) return ['ok' => false, 'error' => 'Аккаунт заблокирован.'];
+  if (!empty($user['is_blocked'])) { security_event('login_blocked', (int)$user['id'], $email); return ['ok' => false, 'error' => 'Аккаунт заблокирован.']; }
 
-  if (!password_verify($password, $user['password_hash'])) return ['ok' => false, 'error' => 'Неверный email или пароль.'];
+  if (!password_verify($password, $user['password_hash'])) { security_event('login_failed', (int)$user['id'], $email); return ['ok' => false, 'error' => 'Неверный email или пароль.']; }
 
   auth_login((int)$user['id'], $user['role']);
+  security_event('login_success', (int)$user['id'], $email);
   return ['ok' => true];
 }

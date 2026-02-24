@@ -11,6 +11,7 @@ $ok = null;
 if ($action === 'delete' && $id && is_post()) {
   csrf_validate();
   if (admin_exercise_delete($id)) {
+    admin_audit_log('exercise_delete', 'exercises', $id);
     flash_set('ok', 'Упражнение удалено.');
   }
   redirect('admin-exercises');
@@ -29,10 +30,12 @@ if (is_post() && ($action === 'add' || ($action === 'edit' && $id))) {
     $error = 'Название обязательно.';
   } else {
     if ($action === 'add') {
-      admin_exercise_add($name, $categoryId, $description ?: null, $technique ?: null, $imageUrl ?: null, $videoUrl ?: null);
+      $newId = admin_exercise_add($name, $categoryId, $description ?: null, $technique ?: null, $imageUrl ?: null, $videoUrl ?: null);
+      admin_audit_log('exercise_add', 'exercises', $newId);
       $ok = 'Упражнение добавлено.';
     } else {
       admin_exercise_update($id, $name, $categoryId, $description ?: null, $technique ?: null, $imageUrl ?: null, $videoUrl ?: null);
+      admin_audit_log('exercise_update', 'exercises', $id);
       $ok = 'Упражнение обновлено.';
     }
   }

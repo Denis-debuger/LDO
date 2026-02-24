@@ -6,7 +6,7 @@
   <title><?= isset($pageTitle) ? e($pageTitle) . ' — ' : '' ?>LDO</title>
   <link rel="stylesheet" href="<?= e(asset_url('css/ldo.css')) ?>">
 </head>
-<body>
+<body data-route="<?= e($current ?? 'public') ?>">
   <header class="navbar">
     <nav class="nav-inner">
       <a href="<?= url('home') ?>" class="brand">
@@ -58,6 +58,7 @@
     </div>
     <?php endif; ?>
 
+    <div id="react-global-shell" class="container"></div>
     <?= $content ?? '' ?>
   </main>
 
@@ -65,6 +66,8 @@
     <div class="container">LDO — Let's Do It. Персональная фитнес-платформа.</div>
   </footer>
 
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="<?= e(asset_url('js/main.js')) ?>"></script>
   <?= $footerScripts ?? '' ?>
 </body>

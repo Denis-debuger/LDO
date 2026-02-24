@@ -23,6 +23,7 @@ if ($token !== '') {
         $hash = password_hash($password, PASSWORD_BCRYPT);
         db()->prepare('UPDATE users SET password_hash = ? WHERE id = ?')->execute([$hash, $userId]);
         password_reset_use($token);
+        security_event('password_reset_success', (int)$userId, null);
         flash_set('ok', 'Пароль изменён. Войдите в систему.');
         redirect('login');
       }
@@ -44,6 +45,7 @@ if ($token !== '') {
       $token = password_reset_request($email);
       if ($token) {
         $resetLink = url('password-reset', ['token' => $token]);
+        security_event('password_reset_request', null, $email);
       }
       flash_set('ok', 'Если email зарегистрирован, проверьте почту. В dev-режиме ссылка показана ниже.');
     }

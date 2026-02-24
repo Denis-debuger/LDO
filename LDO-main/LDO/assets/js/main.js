@@ -17,6 +17,24 @@
     });
   });
 
+
+  // ReactJS: глобальный shell на всех страницах
+  if (window.React && window.ReactDOM) {
+    var globalMount = document.getElementById('react-global-shell');
+    if (globalMount) {
+      function GlobalShell() {
+        var route = document.body.getAttribute('data-route') || 'public';
+        return React.createElement('div', { className: 'react-global-banner' },
+          React.createElement('span', null, 'ReactJS active • route: ' + route)
+        );
+      }
+
+      var globalRoot = ReactDOM.createRoot ? ReactDOM.createRoot(globalMount) : null;
+      if (globalRoot) globalRoot.render(React.createElement(GlobalShell));
+      else ReactDOM.render(React.createElement(GlobalShell), globalMount);
+    }
+  }
+
   // График веса (страница прогресса)
   if (typeof window.LDO_WEIGHT_DATA !== 'undefined' && Array.isArray(window.LDO_WEIGHT_DATA) && window.LDO_WEIGHT_DATA.length > 0) {
     var data = window.LDO_WEIGHT_DATA;
@@ -73,4 +91,91 @@
       container.appendChild(svg);
     }
   }
+
+  // ReactJS: табы в профиле + кастомная загрузка/подгрузка файлов
+  if (window.React && window.ReactDOM) {
+    var tabsMount = document.getElementById('profile-react-tabs');
+    if (tabsMount) {
+      var panels = Array.prototype.slice.call(document.querySelectorAll('[data-tab-panel]'));
+      function ProfileTabs() {
+        var useState = React.useState;
+        var activeState = useState('profile');
+        var active = activeState[0];
+        var setActive = activeState[1];
+
+        React.useEffect(function () {
+          panels.forEach(function (panel) {
+            var name = panel.getAttribute('data-tab-panel');
+            panel.classList.toggle('is-hidden', name !== active);
+          });
+        }, [active]);
+
+        var tabItems = [
+          { key: 'avatar', label: 'Аватар' },
+          { key: 'files', label: 'Файлы' },
+          { key: 'profile', label: 'Профиль' }
+        ];
+
+        return React.createElement('div', { className: 'react-tabs-shell' },
+          tabItems.map(function (tab) {
+            return React.createElement('button', {
+              key: tab.key,
+              type: 'button',
+              className: 'react-tab-btn' + (active === tab.key ? ' is-active' : ''),
+              onClick: function () { setActive(tab.key); }
+            }, tab.label);
+          })
+        );
+      }
+
+      var root = ReactDOM.createRoot ? ReactDOM.createRoot(tabsMount) : null;
+      if (root) root.render(React.createElement(ProfileTabs));
+      else ReactDOM.render(React.createElement(ProfileTabs), tabsMount);
+    }
+
+    var fileMount = document.getElementById('react-file-loader');
+    if (fileMount) {
+      function FileLoader() {
+        var useState = React.useState;
+        var filesState = useState([]);
+        var files = filesState[0];
+        var setFiles = filesState[1];
+        var visibleState = useState(3);
+        var visible = visibleState[0];
+        var setVisible = visibleState[1];
+
+        function onPick(e) {
+          var next = Array.prototype.slice.call(e.target.files || []);
+          setFiles(next);
+          setVisible(3);
+        }
+
+        var visibleFiles = files.slice(0, visible);
+
+        return React.createElement('div', { className: 'file-loader' }, [
+          React.createElement('label', { key: 'pick', className: 'file-loader-dropzone' }, [
+            React.createElement('strong', { key: 't' }, 'Выберите файлы'),
+            React.createElement('div', { key: 'd', className: 'muted' }, 'Поддерживается множественный выбор, список подгружается по 3 файла.'),
+            React.createElement('input', { key: 'i', type: 'file', multiple: true, onChange: onPick, style: { marginTop: '8px' } })
+          ]),
+          React.createElement('ul', { key: 'list', className: 'file-loader-list' },
+            visibleFiles.map(function (f, index) {
+              return React.createElement('li', { key: f.name + index }, f.name + ' (' + Math.round(f.size / 1024) + ' KB)');
+            })
+          ),
+          files.length > visible ? React.createElement('button', {
+            key: 'more',
+            type: 'button',
+            className: 'btn btn-ghost',
+            onClick: function () { setVisible(visible + 3); }
+          }, 'Подгрузить ещё') : null
+        ]);
+      }
+
+      var fileRoot = ReactDOM.createRoot ? ReactDOM.createRoot(fileMount) : null;
+      if (fileRoot) fileRoot.render(React.createElement(FileLoader));
+      else ReactDOM.render(React.createElement(FileLoader), fileMount);
+    }
+  }
+
 })();
