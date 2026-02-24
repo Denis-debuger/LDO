@@ -110,3 +110,35 @@ LDO web-site/
   - Управление программами тренировок
   - Управление упражнениями
   - Управление статьями с медиа (обложка, видео)
+
+
+## Разделение на Backend (PHP) и Frontend (React SPA)
+
+Проект разделён на две части:
+
+- `backend/` — PHP backend с API (`backend/public/api.php`)
+- `frontend/` — React SPA (Vite)
+
+### Backend API
+
+Запуск локально:
+
+```bash
+php -S 0.0.0.0:8080 -t backend/public
+```
+
+Доступные endpoint'ы:
+
+- `GET /api.php?endpoint=health`
+- `GET /api.php?endpoint=profile` (требует авторизацию в PHP-сессии)
+- `POST /api.php?endpoint=profile`
+
+### Frontend (React)
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+SPA использует backend API для загрузки/сохранения профиля и показывает калькулятор ИМТ.
