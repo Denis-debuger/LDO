@@ -10,15 +10,15 @@ const pages = {
 const pageMeta = {
   home: {
     title: 'Главная',
-    subtitle: 'Добро пожаловать в LDO — персонального помощника по фитнесу.',
+    subtitle: 'Персональный центр управления тренировками и питанием.',
   },
   diary: {
     title: 'Дневник',
-    subtitle: 'Записывайте тренировки и питание с мгновенной статистикой.',
+    subtitle: 'Фиксируйте тренировки и приёмы пищи в одном месте.',
   },
   progress: {
     title: 'Прогресс',
-    subtitle: 'Следите за динамикой, чтобы не терять мотивацию.',
+    subtitle: 'Отслеживайте динамику и держите фокус на цели.',
   },
 }
 
@@ -37,27 +37,21 @@ function App() {
 
   return (
     <div className="app-shell">
-      <div className="release-badge">LDO UI v2 · Новый дизайн и подгрузка страниц</div>
-
       <header className="hero">
+        <div className="brand-row">
+          <span className="brand-dot" />
+          <span className="brand-name">LDO</span>
+        </div>
+
         <h1>{pageMeta[activePage].title}</h1>
         <p>{pageMeta[activePage].subtitle}</p>
-      </header>
 
-      <section className="quick-stats" aria-label="Краткие показатели">
-        <article>
-          <strong>3</strong>
-          <span>раздела с lazy load</span>
-        </article>
-        <article>
-          <strong>2</strong>
-          <span>типа загрузки (spinner + skeleton)</span>
-        </article>
-        <article>
-          <strong>100%</strong>
-          <span>адаптивная навигация</span>
-        </article>
-      </section>
+        <div className="meta-pills">
+          <span>Lazy load</span>
+          <span>Skeleton</span>
+          <span>Minimal UI</span>
+        </div>
+      </header>
 
       <nav className="nav-grid" aria-label="Навигация по разделам">
         {Object.keys(pages).map((key) => (
