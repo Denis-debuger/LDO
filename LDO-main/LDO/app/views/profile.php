@@ -182,7 +182,7 @@
           <div id="react-file-loader"></div>
         </section>
 
-        <section data-tab-panel="profile" class="is-hidden">
+        <section data-tab-panel="profile">
         <h2 class="card-title">Мои данные</h2>
         <form method="post" action="<?= url('profile') ?>" class="form">
           <?= csrf_field() ?>
