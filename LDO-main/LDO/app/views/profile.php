@@ -236,6 +236,28 @@
 
     <div class="card card-accent">
       <div class="card-body">
+        <?php
+        $hCm = isset($profile['height_cm']) ? (float)$profile['height_cm'] : 0.0;
+        $wKg = isset($profile['weight_kg']) ? (float)$profile['weight_kg'] : 0.0;
+        $bmi = null;
+        $bmiLabel = null;
+        if ($hCm > 0 && $wKg > 0) {
+          $hM = $hCm / 100;
+          $bmi = $wKg / ($hM * $hM);
+          if ($bmi < 18.5) $bmiLabel = 'Дефицит массы';
+          elseif ($bmi < 25) $bmiLabel = 'Норма';
+          elseif ($bmi < 30) $bmiLabel = 'Избыточная масса';
+          else $bmiLabel = 'Ожирение';
+        }
+        ?>
+        <h2 class="card-title">Калькулятор ИМТ</h2>
+        <div class="kpi" style="margin-bottom:12px">
+          <div class="item">
+            <div class="num" id="bmi-value"><?= $bmi ? e(number_format($bmi, 1, '.', '')) : '—' ?></div>
+            <div class="muted" id="bmi-label"><?= e($bmiLabel ?? 'Заполните рост и вес') ?></div>
+          </div>
+        </div>
+        <p class="muted" style="font-size:12px;margin:0 0 16px 0">ИМТ = вес (кг) / рост² (м)</p>
         <h2 class="card-title">Динамика веса</h2>
         <?php if (empty($weightHistory)): ?>
         <p class="muted">Пока нет записей. Сохраните вес в форме слева.</p>
@@ -261,4 +283,30 @@
       </div>
     </div>
   </div>
+
+<script>
+(function(){
+  var h = document.querySelector('input[name="height_cm"]');
+  var w = document.querySelector('input[name="weight_kg"]');
+  var bmiValue = document.getElementById('bmi-value');
+  var bmiLabel = document.getElementById('bmi-label');
+  if (!h || !w || !bmiValue || !bmiLabel) return;
+  function upd() {
+    var hc = parseFloat(h.value || '0');
+    var wk = parseFloat((w.value || '0').replace(',', '.'));
+    if (hc > 0 && wk > 0) {
+      var hm = hc / 100;
+      var bmi = wk / (hm * hm);
+      bmiValue.textContent = bmi.toFixed(1);
+      if (bmi < 18.5) bmiLabel.textContent = 'Дефицит массы';
+      else if (bmi < 25) bmiLabel.textContent = 'Норма';
+      else if (bmi < 30) bmiLabel.textContent = 'Избыточная масса';
+      else bmiLabel.textContent = 'Ожирение';
+    }
+  }
+  h.addEventListener('input', upd);
+  w.addEventListener('input', upd);
+})();
+</script>
+
 </div>

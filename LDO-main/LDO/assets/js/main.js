@@ -99,7 +99,7 @@
       var panels = Array.prototype.slice.call(document.querySelectorAll('[data-tab-panel]'));
       function ProfileTabs() {
         var useState = React.useState;
-        var activeState = useState('avatar');
+        var activeState = useState('profile');
         var active = activeState[0];
         var setActive = activeState[1];
 
