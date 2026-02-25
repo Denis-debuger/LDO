@@ -13,18 +13,19 @@
     var loaderMessage = appLoader.querySelector('[data-loader-message]');
     var loaderSteps = [
       { at: 0, text: 'Подготавливаем страницу…' },
-      { at: 35, text: 'Загружаем данные…' },
-      { at: 70, text: 'Почти готово…' }
+      { at: 30, text: 'Проверяем модули…' },
+      { at: 60, text: 'Загружаем данные…' },
+      { at: 85, text: 'Финальные штрихи…' }
     ];
-    var loaderProgress = 0;
+    var loaderProgress = 4;
     var loaderDone = false;
     var loaderStartedAt = Date.now();
-    var minLoaderDurationMs = 700;
+    var minLoaderDurationMs = 950;
 
     function updateLoader(value) {
       loaderProgress = Math.max(loaderProgress, Math.min(100, value));
-      if (loaderRing) loaderRing.style.setProperty('--progress', loaderProgress + '%');
-      if (loaderPercent) loaderPercent.textContent = loaderProgress + '%';
+      if (loaderRing) loaderRing.style.setProperty('--progress', loaderProgress.toFixed(1) + '%');
+      if (loaderPercent) loaderPercent.textContent = Math.round(loaderProgress) + '%';
       if (loaderMessage) {
         var stepText = loaderSteps[0].text;
         loaderSteps.forEach(function (step) {
@@ -39,13 +40,12 @@
       document.body.classList.remove('is-app-loading');
       setTimeout(function () {
         appLoader.remove();
-      }, 320);
+      }, 650);
     }
 
     function closeLoader() {
       if (loaderDone) return;
       loaderDone = true;
-      clearInterval(loaderTicker);
       updateLoader(100);
 
       var elapsed = Date.now() - loaderStartedAt;
@@ -53,22 +53,27 @@
       setTimeout(hideLoader, waitTime);
     }
 
-    var loaderTicker = setInterval(function () {
-      if (loaderDone) {
-        clearInterval(loaderTicker);
-        return;
-      }
-      updateLoader(loaderProgress + (loaderProgress < 70 ? 6 : 2));
-    }, 95);
+    function tickLoader() {
+      if (loaderDone) return;
 
-    updateLoader(8);
+      var target = 94;
+      var delta = (target - loaderProgress) * 0.12;
+      if (delta < 0.25) delta = 0.25;
+      updateLoader(loaderProgress + delta);
+
+      requestAnimationFrame(tickLoader);
+    }
+
+    updateLoader(6);
+    requestAnimationFrame(tickLoader);
 
     window.addEventListener('load', function () {
-      setTimeout(closeLoader, 120);
+      setTimeout(closeLoader, 180);
     });
 
-    setTimeout(closeLoader, 4500);
+    setTimeout(closeLoader, 6000);
   }
+
 
   // Простая валидация форм на клиенте
   document.querySelectorAll('form').forEach(function (form) {
