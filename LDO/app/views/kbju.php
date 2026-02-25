@@ -54,4 +54,39 @@
     <?php endif; ?>
   </div>
   <?php endif; ?>
+
+  <div class="card card-accent" style="margin-top:20px">
+    <div class="card-body">
+      <h2 class="card-title">Съедено сегодня</h2>
+      <div class="kpi" style="margin-bottom:16px">
+        <div class="item"><div class="num"><?= e((string)$todayNutrition['calories']) ?></div><div class="muted">ккал</div></div>
+        <div class="item"><div class="num"><?= e((string)$todayNutrition['protein']) ?></div><div class="muted">г белка</div></div>
+        <div class="item"><div class="num"><?= e((string)$todayNutrition['fat']) ?></div><div class="muted">г жиров</div></div>
+        <div class="item"><div class="num"><?= e((string)$todayNutrition['carbs']) ?></div><div class="muted">г углеводов</div></div>
+      </div>
+
+      <?php if (empty($todayMeals)): ?>
+      <p class="muted">Пока нет добавленных продуктов. Добавьте их в <a href="<?= url('profile') ?>" style="color:var(--accent)">профиле</a>.</p>
+      <?php else: ?>
+      <?php $mealTypeLabels = ['breakfast' => 'Завтрак', 'lunch' => 'Обед', 'dinner' => 'Ужин', 'snack' => 'Перекус']; ?>
+      <table>
+        <thead><tr><th>Приём пищи</th><th>Продукт</th><th>Граммы</th><th>Ккал</th><th>Б</th><th>Ж</th><th>У</th></tr></thead>
+        <tbody>
+          <?php foreach ($todayMeals as $meal): ?>
+          <tr>
+            <td><?= e($mealTypeLabels[$meal['meal_type']] ?? '—') ?></td>
+            <td><?= e($meal['food_item_name'] ?? $meal['food_name'] ?? 'Продукт') ?></td>
+            <td><?= e((string)$meal['amount_g']) ?> г</td>
+            <td><?= e((string)$meal['calories']) ?></td>
+            <td><?= e((string)$meal['protein']) ?></td>
+            <td><?= e((string)$meal['fat']) ?></td>
+            <td><?= e((string)$meal['carbs']) ?></td>
+          </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+      <?php endif; ?>
+    </div>
+  </div>
+
 </div>
