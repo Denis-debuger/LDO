@@ -17,22 +17,50 @@
     });
   });
 
+  // Мобильное меню
+  var menuToggle = document.querySelector('[data-menu-toggle]');
+  var navLinks = document.querySelector('[data-nav-links]');
+  if (menuToggle && navLinks) {
+    menuToggle.addEventListener('click', function () {
+      var expanded = menuToggle.getAttribute('aria-expanded') === 'true';
+      menuToggle.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+      navLinks.classList.toggle('is-open', !expanded);
+      document.body.classList.toggle('menu-open', !expanded);
+    });
 
-  // ReactJS: глобальный shell на всех страницах
-  if (window.React && window.ReactDOM) {
-    var globalMount = document.getElementById('react-global-shell');
-    if (globalMount) {
-      function GlobalShell() {
-        var route = document.body.getAttribute('data-route') || 'public';
-        return React.createElement('div', { className: 'react-global-banner' },
-          React.createElement('span', null, 'ReactJS active • route: ' + route)
-        );
-      }
+    navLinks.querySelectorAll('a').forEach(function (link) {
+      link.addEventListener('click', function () {
+        menuToggle.setAttribute('aria-expanded', 'false');
+        navLinks.classList.remove('is-open');
+        document.body.classList.remove('menu-open');
+      });
+    });
+  }
 
-      var globalRoot = ReactDOM.createRoot ? ReactDOM.createRoot(globalMount) : null;
-      if (globalRoot) globalRoot.render(React.createElement(GlobalShell));
-      else ReactDOM.render(React.createElement(GlobalShell), globalMount);
-    }
+  // Табы профиля (без React)
+  var tabsMount = document.getElementById('profile-tabs');
+  if (tabsMount) {
+    var buttons = Array.prototype.slice.call(tabsMount.querySelectorAll('[data-tab-target]'));
+    var panels = Array.prototype.slice.call(document.querySelectorAll('[data-tab-panel]'));
+    var activate = function (tab) {
+      buttons.forEach(function (btn) {
+        var active = btn.getAttribute('data-tab-target') === tab;
+        btn.classList.toggle('is-active', active);
+        btn.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+      panels.forEach(function (panel) {
+        var activePanel = panel.getAttribute('data-tab-panel') === tab;
+        panel.classList.toggle('is-hidden', !activePanel);
+      });
+    };
+
+    buttons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        activate(btn.getAttribute('data-tab-target'));
+      });
+    });
+
+    activate('profile');
   }
 
   // График веса (страница прогресса)
@@ -41,7 +69,6 @@
     var container = document.getElementById('progress-weight-chart');
     if (container) {
       var weights = data.map(function (d) { return parseFloat(d.weight_kg); });
-      var labels = data.map(function (d) { return d.logged_at; });
       var minW = Math.min.apply(null, weights);
       var maxW = Math.max.apply(null, weights);
       var range = maxW - minW || 1;
@@ -58,7 +85,6 @@
       var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
       g.setAttribute('transform', 'translate(' + padding.left + ',' + padding.top + ')');
 
-      // Линия графика
       var pathD = data.map(function (d, i) {
         var x = (i / (data.length - 1 || 1)) * w;
         var y = h - ((parseFloat(d.weight_kg) - minW) / range) * h;
@@ -74,7 +100,6 @@
       path.setAttribute('stroke-linejoin', 'round');
       g.appendChild(path);
 
-      // Точки
       data.forEach(function (d, i) {
         var x = (i / (data.length - 1 || 1)) * w;
         var y = h - ((parseFloat(d.weight_kg) - minW) / range) * h;
@@ -92,90 +117,34 @@
     }
   }
 
-  // ReactJS: табы в профиле + кастомная загрузка/подгрузка файлов
-  if (window.React && window.ReactDOM) {
-    var tabsMount = document.getElementById('profile-react-tabs');
-    if (tabsMount) {
-      var panels = Array.prototype.slice.call(document.querySelectorAll('[data-tab-panel]'));
-      function ProfileTabs() {
-        var useState = React.useState;
-        var activeState = useState('profile');
-        var active = activeState[0];
-        var setActive = activeState[1];
+  // Мини-WYSIWYG для админской формы статьи
+  var editorRoot = document.getElementById('wysiwyg-editor');
+  if (editorRoot) {
+    var output = document.getElementById('article-body');
+    var editable = document.getElementById('wysiwyg-editable');
+    var toolbarButtons = Array.prototype.slice.call(editorRoot.querySelectorAll('[data-cmd]'));
+    if (output && editable) {
+      editable.addEventListener('input', function () {
+        output.value = editable.innerHTML;
+      });
 
-        React.useEffect(function () {
-          panels.forEach(function (panel) {
-            var name = panel.getAttribute('data-tab-panel');
-            panel.classList.toggle('is-hidden', name !== active);
-          });
-        }, [active]);
+      toolbarButtons.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var cmd = btn.getAttribute('data-cmd');
+          var val = btn.getAttribute('data-val') || null;
+          document.execCommand(cmd, false, val);
+          editable.focus();
+          output.value = editable.innerHTML;
+        });
+      });
 
-        var tabItems = [
-          { key: 'avatar', label: 'Аватар' },
-          { key: 'files', label: 'Файлы' },
-          { key: 'profile', label: 'Профиль' }
-        ];
-
-        return React.createElement('div', { className: 'react-tabs-shell' },
-          tabItems.map(function (tab) {
-            return React.createElement('button', {
-              key: tab.key,
-              type: 'button',
-              className: 'react-tab-btn' + (active === tab.key ? ' is-active' : ''),
-              onClick: function () { setActive(tab.key); }
-            }, tab.label);
-          })
-        );
+      var clearBtn = editorRoot.querySelector('[data-clear-format]');
+      if (clearBtn) {
+        clearBtn.addEventListener('click', function () {
+          document.execCommand('removeFormat', false, null);
+          output.value = editable.innerHTML;
+        });
       }
-
-      var root = ReactDOM.createRoot ? ReactDOM.createRoot(tabsMount) : null;
-      if (root) root.render(React.createElement(ProfileTabs));
-      else ReactDOM.render(React.createElement(ProfileTabs), tabsMount);
-    }
-
-    var fileMount = document.getElementById('react-file-loader');
-    if (fileMount) {
-      function FileLoader() {
-        var useState = React.useState;
-        var filesState = useState([]);
-        var files = filesState[0];
-        var setFiles = filesState[1];
-        var visibleState = useState(3);
-        var visible = visibleState[0];
-        var setVisible = visibleState[1];
-
-        function onPick(e) {
-          var next = Array.prototype.slice.call(e.target.files || []);
-          setFiles(next);
-          setVisible(3);
-        }
-
-        var visibleFiles = files.slice(0, visible);
-
-        return React.createElement('div', { className: 'file-loader' }, [
-          React.createElement('label', { key: 'pick', className: 'file-loader-dropzone' }, [
-            React.createElement('strong', { key: 't' }, 'Выберите файлы'),
-            React.createElement('div', { key: 'd', className: 'muted' }, 'Поддерживается множественный выбор, список подгружается по 3 файла.'),
-            React.createElement('input', { key: 'i', type: 'file', multiple: true, onChange: onPick, style: { marginTop: '8px' } })
-          ]),
-          React.createElement('ul', { key: 'list', className: 'file-loader-list' },
-            visibleFiles.map(function (f, index) {
-              return React.createElement('li', { key: f.name + index }, f.name + ' (' + Math.round(f.size / 1024) + ' KB)');
-            })
-          ),
-          files.length > visible ? React.createElement('button', {
-            key: 'more',
-            type: 'button',
-            className: 'btn btn-ghost',
-            onClick: function () { setVisible(visible + 3); }
-          }, 'Подгрузить ещё') : null
-        ]);
-      }
-
-      var fileRoot = ReactDOM.createRoot ? ReactDOM.createRoot(fileMount) : null;
-      if (fileRoot) fileRoot.render(React.createElement(FileLoader));
-      else ReactDOM.render(React.createElement(FileLoader), fileMount);
     }
   }
-
 })();

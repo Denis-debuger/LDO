@@ -17,6 +17,13 @@ function diary_log_get(int $id, int $userId): ?array
   return $stmt->fetch() ?: null;
 }
 
+function diary_log_by_date(int $userId, string $date): ?array
+{
+  $stmt = db()->prepare('SELECT * FROM workout_logs WHERE user_id = ? AND logged_at = ? LIMIT 1');
+  $stmt->execute([$userId, $date]);
+  return $stmt->fetch() ?: null;
+}
+
 function diary_log_exercises(int $logId): array
 {
   $stmt = db()->prepare('

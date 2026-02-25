@@ -4,21 +4,9 @@ declare(strict_types=1);
 $pageTitle = 'Калькулятор КБЖУ';
 $current = 'kbju';
 $profile = profile_get(auth_user_id());
-$result = null;
-
-$weight = (float)($profile['weight_kg'] ?? 0);
-$height = (int)($profile['height_cm'] ?? 0);
-$age = (int)($profile['age'] ?? 0);
-$gender = $profile['gender'] ?? 'male';
-$activity = $profile['activity_level'] ?? 'moderate';
-$goal = $profile['goal'] ?? 'maintain';
-
-if ($weight > 0 && $height > 0 && $age > 0) {
-  $mult = kbju_get_activity_multiplier($activity);
-  $cal = kbju_calc($weight, $height, $age, $gender, $mult);
-  $cal = kbju_adjust_for_goal($cal, $goal);
-  $result = kbju_split($cal, $goal);
-}
+$result = kbju_targets_from_profile($profile ?? []);
+$todayNutrition = meal_total_by_date(auth_user_id(), today());
+$todayMeals = meal_logs_by_date(auth_user_id(), today());
 
 $activityLabels = [
   'sedentary' => 'Минимальная',
@@ -29,4 +17,4 @@ $activityLabels = [
 ];
 $goalLabels = ['maintain' => 'Поддержание', 'lose' => 'Похудение', 'gain' => 'Набор массы'];
 
-render('kbju', compact('pageTitle', 'current', 'profile', 'result', 'activityLabels', 'goalLabels'));
+render('kbju', compact('pageTitle', 'current', 'profile', 'result', 'activityLabels', 'goalLabels', 'todayNutrition', 'todayMeals'));
