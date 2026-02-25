@@ -6,7 +6,17 @@
   <title><?= isset($pageTitle) ? e($pageTitle) . ' — ' : '' ?>LDO</title>
   <link rel="stylesheet" href="<?= e(asset_url('css/ldo.css')) ?>">
 </head>
-<body data-route="<?= e($current ?? 'public') ?>">
+<body class="is-app-loading" data-route="<?= e($current ?? 'public') ?>">
+  <div id="app-loader" class="app-loader" role="status" aria-live="polite" aria-label="Загрузка страницы">
+    <div class="app-loader__card">
+      <div class="app-loader__brand">LDO</div>
+      <div class="app-loader__ring" aria-hidden="true">
+        <div class="app-loader__ring-inner"></div>
+      </div>
+      <p class="app-loader__percent" data-loader-percent>0%</p>
+      <p class="app-loader__message" data-loader-message>Подготавливаем страницу…</p>
+    </div>
+  </div>
   <header class="navbar">
     <nav class="nav-inner">
       <a href="<?= url('home') ?>" class="brand">

@@ -5,6 +5,61 @@
 (function () {
   'use strict';
 
+  // Глобальный загрузчик для PHP-страниц
+  var appLoader = document.getElementById('app-loader');
+  if (appLoader) {
+    var loaderRing = appLoader.querySelector('.app-loader__ring');
+    var loaderPercent = appLoader.querySelector('[data-loader-percent]');
+    var loaderMessage = appLoader.querySelector('[data-loader-message]');
+    var loaderSteps = [
+      { at: 0, text: 'Подготавливаем страницу…' },
+      { at: 35, text: 'Загружаем данные…' },
+      { at: 70, text: 'Почти готово…' }
+    ];
+    var loaderProgress = 0;
+    var loaderDone = false;
+
+    function updateLoader(value) {
+      loaderProgress = Math.max(loaderProgress, Math.min(100, value));
+      if (loaderRing) loaderRing.style.setProperty('--progress', loaderProgress + '%');
+      if (loaderPercent) loaderPercent.textContent = loaderProgress + '%';
+      if (loaderMessage) {
+        var stepText = loaderSteps[0].text;
+        loaderSteps.forEach(function (step) {
+          if (loaderProgress >= step.at) stepText = step.text;
+        });
+        loaderMessage.textContent = stepText;
+      }
+    }
+
+    var loaderTicker = setInterval(function () {
+      if (loaderDone) {
+        clearInterval(loaderTicker);
+        return;
+      }
+      updateLoader(loaderProgress + (loaderProgress < 70 ? 7 : 3));
+    }, 90);
+
+    function closeLoader() {
+      if (loaderDone) return;
+      loaderDone = true;
+      clearInterval(loaderTicker);
+      updateLoader(100);
+
+      appLoader.classList.add('is-hidden');
+      document.body.classList.remove('is-app-loading');
+      setTimeout(function () {
+        appLoader.remove();
+      }, 320);
+    }
+
+    window.addEventListener('load', function () {
+      setTimeout(closeLoader, 140);
+    });
+
+    setTimeout(closeLoader, 4000);
+  }
+
   // Простая валидация форм на клиенте
   document.querySelectorAll('form').forEach(function (form) {
     form.addEventListener('submit', function () {
