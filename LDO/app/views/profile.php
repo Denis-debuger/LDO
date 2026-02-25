@@ -89,6 +89,7 @@
     <div class="card card-accent"><div class="card-body">
       <div id="profile-tabs" class="react-tabs-shell" role="tablist">
         <button type="button" class="react-tab-btn" data-tab-target="profile" aria-selected="true">Профиль</button>
+        <button type="button" class="react-tab-btn" data-tab-target="nutrition" aria-selected="false">Питание</button>
         <button type="button" class="react-tab-btn" data-tab-target="avatar" aria-selected="false">Аватар</button>
       </div>
 
@@ -110,6 +111,68 @@
           <label>Цель<select name="goal"><?php foreach ($goalLabels as $k => $v): ?><option value="<?= e($k) ?>" <?= ($profile['goal'] ?? 'maintain') === $k ? 'selected' : '' ?>><?= e($v) ?></option><?php endforeach; ?></select></label>
           <button type="submit" class="btn btn-primary">Сохранить</button>
         </form>
+      </section>
+
+      <section data-tab-panel="nutrition" class="is-hidden">
+        <h2 class="card-title">Что вы съели сегодня</h2>
+        <form method="post" action="<?= url('profile') ?>" class="form" style="margin-bottom:16px">
+          <?= csrf_field() ?>
+          <input type="hidden" name="form_type" value="meal_add">
+          <div class="row">
+            <label>Приём пищи
+              <select name="meal_type">
+                <option value="breakfast">Завтрак</option>
+                <option value="lunch">Обед</option>
+                <option value="dinner">Ужин</option>
+                <option value="snack" selected>Перекус</option>
+              </select>
+            </label>
+            <label>Продукт
+              <select name="food_item_id" required>
+                <option value="">Выберите продукт</option>
+                <?php foreach ($foodItems as $food): ?>
+                <option value="<?= e((string)$food['id']) ?>"><?= e($food['name']) ?></option>
+                <?php endforeach; ?>
+              </select>
+            </label>
+          </div>
+          <label>Количество (г)
+            <input type="number" name="amount_g" min="1" step="1" value="100" required>
+          </label>
+          <button type="submit" class="btn btn-primary">Добавить продукт</button>
+        </form>
+
+        <?php if (empty($todayMeals)): ?>
+        <p class="muted">Сегодня вы ещё не добавили продукты.</p>
+        <?php else: ?>
+        <?php $mealTypeLabels = ['breakfast' => 'Завтрак', 'lunch' => 'Обед', 'dinner' => 'Ужин', 'snack' => 'Перекус']; ?>
+        <table>
+          <thead>
+            <tr><th>Приём пищи</th><th>Продукт</th><th>Граммы</th><th>Ккал</th><th>Б</th><th>Ж</th><th>У</th><th></th></tr>
+          </thead>
+          <tbody>
+            <?php foreach ($todayMeals as $meal): ?>
+            <tr>
+              <td><?= e($mealTypeLabels[$meal['meal_type']] ?? '—') ?></td>
+              <td><?= e($meal['food_item_name'] ?? $meal['food_name'] ?? 'Продукт') ?></td>
+              <td><?= e((string)$meal['amount_g']) ?> г</td>
+              <td><?= e((string)$meal['calories']) ?></td>
+              <td><?= e((string)$meal['protein']) ?></td>
+              <td><?= e((string)$meal['fat']) ?></td>
+              <td><?= e((string)$meal['carbs']) ?></td>
+              <td>
+                <form method="post" action="<?= url('profile') ?>" onsubmit="return confirm('Удалить продукт из рациона?')">
+                  <?= csrf_field() ?>
+                  <input type="hidden" name="form_type" value="meal_delete">
+                  <input type="hidden" name="meal_id" value="<?= e((string)$meal['id']) ?>">
+                  <button type="submit" class="btn btn-ghost" style="padding:4px 8px;font-size:12px">×</button>
+                </form>
+              </td>
+            </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
+        <?php endif; ?>
       </section>
 
       <section data-tab-panel="avatar" class="is-hidden">

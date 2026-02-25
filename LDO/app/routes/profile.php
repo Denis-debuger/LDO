@@ -6,13 +6,43 @@ $current = 'profile';
 $userId = auth_user_id();
 $profile = profile_get($userId);
 $weightHistory = weight_log_list($userId);
+$foodItems = food_items_list();
+$todayMeals = meal_logs_by_date($userId, today());
 $error = null;
 $ok = null;
 
 if (is_post()) {
   csrf_validate();
+  $formType = (string)($_POST['form_type'] ?? '');
+  $isMealAddForm = $formType === 'meal_add';
+  $isMealDeleteForm = $formType === 'meal_delete';
   $isAvatarForm = !empty($_FILES['avatar']['tmp_name']) || (isset($_POST['remove_avatar']) && $_POST['remove_avatar'] === '1');
-  if ($isAvatarForm) {
+
+  if ($isMealAddForm) {
+    $mealType = in_array($_POST['meal_type'] ?? '', ['breakfast', 'lunch', 'dinner', 'snack'], true) ? (string)$_POST['meal_type'] : 'snack';
+    $foodItemId = isset($_POST['food_item_id']) && $_POST['food_item_id'] !== '' ? (int)$_POST['food_item_id'] : null;
+    $amountG = (float)str_replace(',', '.', (string)($_POST['amount_g'] ?? '0'));
+
+    if (!$foodItemId || $amountG <= 0) {
+      $error = 'Выберите продукт и укажите количество в граммах.';
+    } else {
+      $todayLog = diary_log_by_date($userId, today());
+      $logId = $todayLog ? (int)$todayLog['id'] : diary_log_add($userId, today(), 'Питание из профиля');
+      $selectedFood = food_item_get($foodItemId);
+      $nutrition = meal_calculate_nutrition($foodItemId, null, $amountG);
+      meal_log_add($logId, $mealType, $foodItemId, $selectedFood['name'] ?? null, $amountG, $nutrition['calories'], $nutrition['protein'], $nutrition['fat'], $nutrition['carbs']);
+      $ok = 'Продукт добавлен в рацион за сегодня.';
+    }
+    $profile = profile_get($userId);
+  } elseif ($isMealDeleteForm) {
+    $mealId = (int)($_POST['meal_id'] ?? 0);
+    if ($mealId > 0 && meal_log_delete($mealId, $userId)) {
+      $ok = 'Продукт удалён из рациона.';
+    } else {
+      $error = 'Не удалось удалить запись о питании.';
+    }
+    $profile = profile_get($userId);
+  } elseif ($isAvatarForm) {
     if (!empty($_FILES['avatar']['tmp_name'])) {
       $avResult = avatar_upload($userId, $_FILES['avatar']);
       if ($avResult['ok']) $ok = 'Аватар обновлён.';
@@ -48,6 +78,8 @@ if (is_post()) {
     $ok = 'Профиль обновлён.';
   }
 }
+
+$todayMeals = meal_logs_by_date($userId, today());
 
 $activityLabels = [
   'sedentary' => 'Минимальная',
@@ -89,4 +121,4 @@ $weightStats = ['current' => $currentWeight, 'target' => $targetWeight, 'percent
 $year = isset($_GET['year']) ? (int)$_GET['year'] : null;
 $chartData = stats_activity_chart($userId, $year);
 
-render('profile', compact('pageTitle', 'current', 'profile', 'weightHistory', 'error', 'ok', 'activityLabels', 'goalLabels', 'chartData', 'nutritionProgress', 'weightStats'));
+render('profile', compact('pageTitle', 'current', 'profile', 'weightHistory', 'error', 'ok', 'activityLabels', 'goalLabels', 'chartData', 'nutritionProgress', 'weightStats', 'foodItems', 'todayMeals'));
