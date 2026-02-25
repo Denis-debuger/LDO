@@ -33,7 +33,7 @@
       <?php endif; ?>
       
       <div style="line-height:1.7">
-        <?= nl2br(e($article['body'])) ?>
+        <?= article_body_render((string)$article['body']) ?>
       </div>
       <p style="margin-top:24px"><a href="<?= url('articles') ?>" style="color:var(--accent)">← К списку статей</a></p>
     </div>

@@ -13,6 +13,10 @@
         <span class="brand-badge">LDO</span>
         <span>Let's Do It</span>
       </a>
+      <button class="menu-toggle" type="button" aria-label="Открыть меню" aria-expanded="false" data-menu-toggle>
+        ☰
+      </button>
+      <div class="nav-menu" data-nav-links>
       <div class="nav-links">
         <?php if (is_logged_in()): ?>
           <a href="<?= url('profile') ?>" class="nav-link <?= ($current ?? '') === 'profile' ? 'active' : '' ?>">Профиль</a>
@@ -44,6 +48,7 @@
           <a href="<?= url('register') ?>" class="btn btn-ghost">Регистрация</a>
         <?php endif; ?>
       </div>
+      </div>
     </nav>
   </header>
 
@@ -58,7 +63,6 @@
     </div>
     <?php endif; ?>
 
-    <div id="react-global-shell" class="container"></div>
     <?= $content ?? '' ?>
   </main>
 
@@ -66,8 +70,6 @@
     <div class="container">LDO — Let's Do It. Персональная фитнес-платформа.</div>
   </footer>
 
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="<?= e(asset_url('js/main.js')) ?>"></script>
   <?= $footerScripts ?? '' ?>
 </body>

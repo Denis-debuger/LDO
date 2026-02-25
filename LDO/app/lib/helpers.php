@@ -70,3 +70,17 @@ function upload_url(string $path): string
 {
   return base_path() . 'uploads/' . ltrim($path, '/');
 }
+
+
+function article_body_sanitize(string $html): string
+{
+  $allowed = '<p><br><strong><b><em><i><u><ul><ol><li><h2><h3><blockquote><a>';
+  $clean = strip_tags($html, $allowed);
+  $clean = preg_replace("/<a\\s+[^>]*href=[\"']?(javascript:|data:)[^>]*>/iu", '<a>', $clean ?? '');
+  return trim((string)$clean);
+}
+
+function article_body_render(string $html): string
+{
+  return article_body_sanitize($html);
+}

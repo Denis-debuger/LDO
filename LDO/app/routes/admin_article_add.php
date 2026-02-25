@@ -12,7 +12,7 @@ if (is_post()) {
   $slug = clean_str((string)($_POST['slug'] ?? ''));
   $categoryId = isset($_POST['category_id']) && $_POST['category_id'] !== '' ? (int)$_POST['category_id'] : null;
   $excerpt = clean_str((string)($_POST['excerpt'] ?? ''));
-  $body = (string)($_POST['body'] ?? '');
+  $body = article_body_sanitize((string)($_POST['body'] ?? ''));
   $published = isset($_POST['published']) && $_POST['published'] === '1';
   
   if ($slug === '') $slug = mb_strtolower(preg_replace('/[^a-zа-я0-9]+/ui', '-', $title));

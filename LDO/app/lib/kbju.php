@@ -2,8 +2,7 @@
 declare(strict_types=1);
 
 /**
- * Расчёт BMR (Mifflin-St Jeor) и суточной калорийности.
- * Также расчёт БЖУ в ккал и граммах.
+ * Расчёт TDEE по формуле Mifflin-St Jeor.
  */
 function kbju_calc(float $weight, int $height, int $age, string $gender, float $activityMultiplier): float
 {
@@ -17,11 +16,11 @@ function kbju_calc(float $weight, int $height, int $age, string $gender, float $
 function kbju_get_activity_multiplier(string $level): float
 {
   $map = [
-    'sedentary'  => 1.2,   // минимальная
-    'light'      => 1.375, // лёгкая
-    'moderate'   => 1.55,  // средняя
-    'active'     => 1.725, // высокая
-    'very'       => 1.9,   // очень высокая
+    'sedentary' => 1.2,
+    'light' => 1.375,
+    'moderate' => 1.55,
+    'active' => 1.725,
+    'very' => 1.9,
   ];
   return $map[$level] ?? 1.2;
 }
@@ -29,27 +28,44 @@ function kbju_get_activity_multiplier(string $level): float
 function kbju_adjust_for_goal(float $calories, string $goal): float
 {
   if ($goal === 'lose') return $calories * 0.85;
-  if ($goal === 'gain') return $calories * 1.15;
+  if ($goal === 'gain') return $calories * 1.12;
   return $calories;
 }
 
-function kbju_split(float $calories, string $goal): array
+function kbju_split(float $calories, string $goal, float $weightKg = 0): array
 {
-  $proteinRatio = $goal === 'lose' ? 0.35 : ($goal === 'gain' ? 0.30 : 0.30);
-  $fatRatio = 0.30;
-  $carbRatio = 1 - $proteinRatio - $fatRatio;
+  $weight = $weightKg > 0 ? $weightKg : 70;
+  $proteinPerKg = $goal === 'lose' ? 2.0 : ($goal === 'gain' ? 1.8 : 1.6);
+  $fatPerKg = $goal === 'gain' ? 1.0 : 0.9;
 
-  $pKcal = round($calories * $proteinRatio, 0);
-  $fKcal = round($calories * $fatRatio, 0);
-  $cKcal = round($calories * $carbRatio, 0);
+  $proteinG = max(40, round($weight * $proteinPerKg, 0));
+  $fatG = max(35, round($weight * $fatPerKg, 0));
+
+  $proteinKcal = $proteinG * 4;
+  $fatKcal = $fatG * 9;
+  $carbsKcal = max(0, round($calories - $proteinKcal - $fatKcal, 0));
+  $carbsG = round($carbsKcal / 4, 0);
 
   return [
-    'calories' => round($calories, 0),
-    'protein_kcal' => $pKcal,
-    'fat_kcal' => $fKcal,
-    'carbs_kcal' => $cKcal,
-    'protein_g' => round($pKcal / 4, 0),
-    'fat_g' => round($fKcal / 9, 0),
-    'carbs_g' => round($cKcal / 4, 0),
+    'calories' => (int)round($calories, 0),
+    'protein_kcal' => (int)$proteinKcal,
+    'fat_kcal' => (int)$fatKcal,
+    'carbs_kcal' => (int)$carbsKcal,
+    'protein_g' => (int)$proteinG,
+    'fat_g' => (int)$fatG,
+    'carbs_g' => (int)$carbsG,
   ];
+}
+
+function kbju_targets_from_profile(array $profile): ?array
+{
+  $weight = (float)($profile['weight_kg'] ?? 0);
+  $height = (int)($profile['height_cm'] ?? 0);
+  $age = (int)($profile['age'] ?? 0);
+  if ($weight <= 0 || $height <= 0 || $age <= 0) return null;
+
+  $mult = kbju_get_activity_multiplier((string)($profile['activity_level'] ?? 'moderate'));
+  $cal = kbju_adjust_for_goal(kbju_calc($weight, $height, $age, (string)($profile['gender'] ?? 'male'), $mult), (string)($profile['goal'] ?? 'maintain'));
+
+  return kbju_split($cal, (string)($profile['goal'] ?? 'maintain'), $weight);
 }
