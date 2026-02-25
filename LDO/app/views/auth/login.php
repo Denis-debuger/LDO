@@ -1,11 +1,15 @@
-<div class="auth-shell">
+<div class="auth-shell auth-shell--modern">
   <div class="auth-left">
-    <div style="width:100%;max-width:360px">
-      <h1 style="margin:0 0 24px 0;font-size:24px">Вход в LDO</h1>
+    <section class="auth-card" aria-labelledby="login-title">
+      <p class="auth-eyebrow">LDO Platform</p>
+      <h1 id="login-title" class="auth-title">С возвращением 👋</h1>
+      <p class="auth-lead">Войдите, чтобы продолжить работу над целями, привычками и прогрессом.</p>
+
       <?php if ($error ?? null): ?>
-      <div class="flash err" style="margin-bottom:16px"><?= e($error) ?></div>
+      <div class="flash err auth-alert"><?= e($error) ?></div>
       <?php endif; ?>
-      <form method="post" action="<?= url('login') ?>" class="form">
+
+      <form method="post" action="<?= url('login') ?>" class="form auth-form">
         <?= csrf_field() ?>
         <label>
           Email
@@ -16,22 +20,31 @@
           Пароль
           <input type="password" name="password" required autocomplete="current-password" minlength="8" placeholder="Минимум 8 символов">
         </label>
-
         <label>
           CAPTCHA: <?= e($captchaQuestion ?? '') ?>
           <input type="text" name="captcha" required inputmode="numeric" placeholder="Введите ответ">
         </label>
-        <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <button type="submit" class="btn btn-primary">Войти</button>
-          <a href="<?= url('password-reset') ?>" class="btn btn-ghost">Забыли пароль?</a>
-        </div>
+
+        <button type="submit" class="btn btn-primary auth-submit">Войти</button>
       </form>
-    </div>
+
+      <div class="auth-links">
+        <a href="<?= url('password-reset') ?>" class="auth-link">Забыли пароль?</a>
+        <span class="auth-dot">•</span>
+        <a href="<?= url('register') ?>" class="auth-link">Создать аккаунт</a>
+      </div>
+    </section>
   </div>
-  <div class="auth-right">
-    <div class="slogan">
+
+  <aside class="auth-right auth-right--login">
+    <div class="slogan slogan--modern">
       <div class="big">LDO — Let's Do It.</div>
-      <div class="sub">Дисциплина. Прогресс. Результат.</div>
+      <div class="sub">Дисциплина, системность и результат в одном месте.</div>
+      <ul class="auth-points">
+        <li>Планируйте тренировки и питание</li>
+        <li>Отслеживайте прогресс в реальном времени</li>
+        <li>Двигайтесь к цели каждый день</li>
+      </ul>
     </div>
-  </div>
+  </aside>
 </div>
