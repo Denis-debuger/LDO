@@ -63,7 +63,15 @@ function today(): string
 
 function asset_url(string $path): string
 {
-  return base_path() . 'assets/' . ltrim($path, '/');
+  $cleanPath = ltrim($path, '/');
+  $url = base_path() . 'assets/' . $cleanPath;
+  $fullPath = __DIR__ . '/../../assets/' . $cleanPath;
+
+  if (is_file($fullPath)) {
+    return $url . '?v=' . (string)filemtime($fullPath);
+  }
+
+  return $url;
 }
 
 function upload_url(string $path): string

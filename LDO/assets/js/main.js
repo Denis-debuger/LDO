@@ -5,6 +5,76 @@
 (function () {
   'use strict';
 
+  // Глобальный загрузчик для PHP-страниц
+  var appLoader = document.getElementById('app-loader');
+  if (appLoader) {
+    var loaderRing = appLoader.querySelector('.app-loader__ring');
+    var loaderPercent = appLoader.querySelector('[data-loader-percent]');
+    var loaderMessage = appLoader.querySelector('[data-loader-message]');
+    var loaderSteps = [
+      { at: 0, text: 'Подготавливаем страницу…' },
+      { at: 30, text: 'Проверяем модули…' },
+      { at: 60, text: 'Загружаем данные…' },
+      { at: 85, text: 'Финальные штрихи…' }
+    ];
+    var loaderProgress = 4;
+    var loaderDone = false;
+    var loaderStartedAt = Date.now();
+    var minLoaderDurationMs = 950;
+
+    function updateLoader(value) {
+      loaderProgress = Math.max(loaderProgress, Math.min(100, value));
+      if (loaderRing) loaderRing.style.setProperty('--progress', loaderProgress.toFixed(1) + '%');
+      if (loaderPercent) loaderPercent.textContent = Math.round(loaderProgress) + '%';
+      if (loaderMessage) {
+        var stepText = loaderSteps[0].text;
+        loaderSteps.forEach(function (step) {
+          if (loaderProgress >= step.at) stepText = step.text;
+        });
+        loaderMessage.textContent = stepText;
+      }
+    }
+
+    function hideLoader() {
+      appLoader.classList.add('is-hidden');
+      document.body.classList.remove('is-app-loading');
+      setTimeout(function () {
+        appLoader.remove();
+      }, 650);
+    }
+
+    function closeLoader() {
+      if (loaderDone) return;
+      loaderDone = true;
+      updateLoader(100);
+
+      var elapsed = Date.now() - loaderStartedAt;
+      var waitTime = Math.max(0, minLoaderDurationMs - elapsed);
+      setTimeout(hideLoader, waitTime);
+    }
+
+    function tickLoader() {
+      if (loaderDone) return;
+
+      var target = 94;
+      var delta = (target - loaderProgress) * 0.12;
+      if (delta < 0.25) delta = 0.25;
+      updateLoader(loaderProgress + delta);
+
+      requestAnimationFrame(tickLoader);
+    }
+
+    updateLoader(6);
+    requestAnimationFrame(tickLoader);
+
+    window.addEventListener('load', function () {
+      setTimeout(closeLoader, 180);
+    });
+
+    setTimeout(closeLoader, 6000);
+  }
+
+
   // Простая валидация форм на клиенте
   document.querySelectorAll('form').forEach(function (form) {
     form.addEventListener('submit', function () {
