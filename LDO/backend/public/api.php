@@ -15,28 +15,34 @@ if (request_method() === 'OPTIONS') {
 
 $endpoint = (string)($_GET['endpoint'] ?? 'health');
 
-if ($endpoint === 'health') {
-  echo json_encode(['ok' => true, 'service' => 'ldo-backend', 'time' => now_dt()]);
+$send = static function (array $payload, int $status = 200): void {
+  http_response_code($status);
+  echo json_encode($payload);
   exit;
-}
+};
 
-if ($endpoint === 'profile') {
+$requireUser = static function () use ($send): int {
   if (!is_logged_in()) {
-    http_response_code(401);
-    echo json_encode(['ok' => false, 'error' => 'Unauthorized']);
-    exit;
+    $send(['ok' => false, 'error' => 'Unauthorized'], 401);
   }
 
   $userId = auth_user_id();
   if (!$userId) {
-    http_response_code(401);
-    echo json_encode(['ok' => false, 'error' => 'Unauthorized']);
-    exit;
+    $send(['ok' => false, 'error' => 'Unauthorized'], 401);
   }
 
+  return $userId;
+};
+
+if ($endpoint === 'health') {
+  $send(['ok' => true, 'service' => 'ldo-backend', 'time' => now_dt()]);
+}
+
+if ($endpoint === 'profile') {
+  $userId = $requireUser();
+
   if (request_method() === 'GET') {
-    echo json_encode(['ok' => true, 'profile' => profile_get($userId)]);
-    exit;
+    $send(['ok' => true, 'profile' => profile_get($userId)]);
   }
 
   if (request_method() === 'POST') {
@@ -49,10 +55,86 @@ if ($endpoint === 'profile') {
       'activity_level' => in_array(($body['activity_level'] ?? ''), ['sedentary', 'light', 'moderate', 'active', 'very'], true) ? $body['activity_level'] : 'moderate',
       'goal' => in_array(($body['goal'] ?? ''), ['maintain', 'lose', 'gain'], true) ? $body['goal'] : 'maintain',
     ]);
-    echo json_encode(['ok' => true, 'profile' => profile_get($userId)]);
-    exit;
+    $send(['ok' => true, 'profile' => profile_get($userId)]);
   }
+
+  $send(['ok' => false, 'error' => 'Method not allowed'], 405);
 }
 
-http_response_code(404);
-echo json_encode(['ok' => false, 'error' => 'Not found']);
+if ($endpoint === 'foods') {
+  $requireUser();
+  $q = clean_str((string)($_GET['q'] ?? ''));
+  $send(['ok' => true, 'foods' => food_items_list($q)]);
+}
+
+if ($endpoint === 'nutrition-today') {
+  $userId = $requireUser();
+  $date = today();
+  $send([
+    'ok' => true,
+    'date' => $date,
+    'total' => meal_total_by_date($userId, $date),
+    'meals' => meal_logs_by_date($userId, $date),
+  ]);
+}
+
+if ($endpoint === 'meal-add') {
+  $userId = $requireUser();
+  if (request_method() !== 'POST') {
+    $send(['ok' => false, 'error' => 'Method not allowed'], 405);
+  }
+
+  $body = json_decode((string)file_get_contents('php://input'), true) ?: [];
+  $mealType = in_array(($body['meal_type'] ?? ''), ['breakfast', 'lunch', 'dinner', 'snack'], true) ? (string)$body['meal_type'] : 'snack';
+  $foodItemId = isset($body['food_item_id']) ? (int)$body['food_item_id'] : 0;
+  $amountG = isset($body['amount_g']) ? (float)$body['amount_g'] : 0;
+
+  if ($foodItemId <= 0 || $amountG <= 0) {
+    $send(['ok' => false, 'error' => 'Некорректные данные для добавления продукта.'], 422);
+  }
+
+  $food = food_item_get($foodItemId);
+  if (!$food) {
+    $send(['ok' => false, 'error' => 'Продукт не найден.'], 404);
+  }
+
+  $todayLog = diary_log_by_date($userId, today());
+  $logId = $todayLog ? (int)$todayLog['id'] : diary_log_add($userId, today(), 'Питание из React');
+  $nutrition = meal_calculate_nutrition($foodItemId, null, $amountG);
+
+  $mealId = meal_log_add(
+    $logId,
+    $mealType,
+    $foodItemId,
+    $food['name'] ?? null,
+    $amountG,
+    $nutrition['calories'],
+    $nutrition['protein'],
+    $nutrition['fat'],
+    $nutrition['carbs']
+  );
+
+  $send(['ok' => true, 'meal_id' => $mealId]);
+}
+
+if ($endpoint === 'meal-delete') {
+  $userId = $requireUser();
+  if (request_method() !== 'POST') {
+    $send(['ok' => false, 'error' => 'Method not allowed'], 405);
+  }
+
+  $body = json_decode((string)file_get_contents('php://input'), true) ?: [];
+  $mealId = isset($body['meal_id']) ? (int)$body['meal_id'] : 0;
+
+  if ($mealId <= 0) {
+    $send(['ok' => false, 'error' => 'Некорректный meal_id.'], 422);
+  }
+
+  if (!meal_log_delete($mealId, $userId)) {
+    $send(['ok' => false, 'error' => 'Не удалось удалить запись.'], 404);
+  }
+
+  $send(['ok' => true]);
+}
+
+$send(['ok' => false, 'error' => 'Not found'], 404);
