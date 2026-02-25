@@ -18,6 +18,8 @@
     ];
     var loaderProgress = 0;
     var loaderDone = false;
+    var loaderStartedAt = Date.now();
+    var minLoaderDurationMs = 700;
 
     function updateLoader(value) {
       loaderProgress = Math.max(loaderProgress, Math.min(100, value));
@@ -32,20 +34,7 @@
       }
     }
 
-    var loaderTicker = setInterval(function () {
-      if (loaderDone) {
-        clearInterval(loaderTicker);
-        return;
-      }
-      updateLoader(loaderProgress + (loaderProgress < 70 ? 7 : 3));
-    }, 90);
-
-    function closeLoader() {
-      if (loaderDone) return;
-      loaderDone = true;
-      clearInterval(loaderTicker);
-      updateLoader(100);
-
+    function hideLoader() {
       appLoader.classList.add('is-hidden');
       document.body.classList.remove('is-app-loading');
       setTimeout(function () {
@@ -53,11 +42,32 @@
       }, 320);
     }
 
+    function closeLoader() {
+      if (loaderDone) return;
+      loaderDone = true;
+      clearInterval(loaderTicker);
+      updateLoader(100);
+
+      var elapsed = Date.now() - loaderStartedAt;
+      var waitTime = Math.max(0, minLoaderDurationMs - elapsed);
+      setTimeout(hideLoader, waitTime);
+    }
+
+    var loaderTicker = setInterval(function () {
+      if (loaderDone) {
+        clearInterval(loaderTicker);
+        return;
+      }
+      updateLoader(loaderProgress + (loaderProgress < 70 ? 6 : 2));
+    }, 95);
+
+    updateLoader(8);
+
     window.addEventListener('load', function () {
-      setTimeout(closeLoader, 140);
+      setTimeout(closeLoader, 120);
     });
 
-    setTimeout(closeLoader, 4000);
+    setTimeout(closeLoader, 4500);
   }
 
   // Простая валидация форм на клиенте
