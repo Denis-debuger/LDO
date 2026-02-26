@@ -13,14 +13,14 @@ $heroAlt = e($hero['alt'] ?? 'LDO hero');
 <div class="home-wrap">
   <div class="container">
     <section class="home-shell">
-      <div class="home-topline">Pay later with Klarna</div>
+      <div class="home-topline">LDO — платформа тренировок, питания и прогресса</div>
 
       <div class="home-categories">
         <div class="home-tabs">
-          <button type="button" class="home-tab is-active">Ladies</button>
-          <button type="button" class="home-tab">Dudes</button>
-          <button type="button" class="home-tab">Accessories</button>
-          <button type="button" class="home-tab">Athlete club</button>
+          <button type="button" class="home-tab is-active">Тренировки</button>
+          <button type="button" class="home-tab">Питание</button>
+          <button type="button" class="home-tab">Дневник</button>
+          <button type="button" class="home-tab">Сообщество</button>
         </div>
         <div class="home-icons">
           <span>EN</span>
@@ -43,11 +43,11 @@ $heroAlt = e($hero['alt'] ?? 'LDO hero');
 
         <div class="home-hero-overlay"></div>
         <div class="home-hero-content">
-          <h1>BLACKOUT</h1>
-          <p>Check out the latest releases for Ladies &amp; Dudes</p>
+          <h1>Достигайте формы системно</h1>
+          <p>Ведите дневник тренировок, контролируйте КБЖУ и отслеживайте изменения без хаоса.</p>
           <?php if (!is_logged_in()): ?>
             <div class="home-actions">
-              <a href="<?= url('register') ?>" class="btn btn-primary">SHOP</a>
+              <a href="<?= url('register') ?>" class="btn btn-primary">Начать</a>
               <a href="<?= url('login') ?>" class="btn btn-ghost">Войти</a>
             </div>
           <?php else: ?>
@@ -58,6 +58,18 @@ $heroAlt = e($hero['alt'] ?? 'LDO hero');
           <?php endif; ?>
         </div>
       </div>
+
+      <section class="card card-accent" style="margin:20px 0">
+        <div class="card-body">
+          <h2 class="card-title">Что вы получите в LDO</h2>
+          <ul class="muted" style="margin:0;padding-left:18px;line-height:1.8">
+            <li>Готовые тренировочные программы для разных уровней подготовки.</li>
+            <li>Базу упражнений с подсказками по технике и безопасному прогрессу.</li>
+            <li>Инструменты учёта питания, КБЖУ и динамики веса.</li>
+            <li>Раздел статей с практическими рекомендациями по восстановлению и режиму.</li>
+          </ul>
+        </div>
+      </section>
 
       <div class="home-tiles">
         <?php for ($i = 1; $i <= 2; $i++): ?>
