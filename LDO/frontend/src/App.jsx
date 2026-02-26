@@ -1,5 +1,26 @@
 import { useEffect, useState } from 'react'
 
+const NEWS = [
+  { title: 'Новый челлендж на 21 день', text: 'Запустили программу привычек: сон, вода, шаги и 3 тренировки в неделю.' },
+  { title: 'Обновлены планы питания', text: 'Добавлены варианты рационов под снижение веса и поддержание формы.' },
+  { title: 'Гайды по технике', text: 'В библиотеке появились короткие подсказки по базовым упражнениям.' },
+]
+
+const WORKOUT_DAYS = [
+  ['Понедельник', 'Спина + кардио 20 мин'],
+  ['Среда', 'Ноги + мобилити'],
+  ['Пятница', 'Грудь + руки'],
+  ['Воскресенье', 'Активное восстановление'],
+]
+
+const FOOD_PLAN = [
+  ['Калории', '2200 ккал'],
+  ['Белки', '160 г'],
+  ['Жиры', '70 г'],
+  ['Углеводы', '240 г'],
+  ['Вода', '2.4 л'],
+]
+
 function useHashRoute() {
   const [route, setRoute] = useState(window.location.hash.replace('#/', '') || 'home')
 
@@ -71,17 +92,17 @@ function HomePage({ navigate }) {
           <article className="home-tile">
             <h3>План на неделю</h3>
             <ul>
-              <li>Пн — Спина + 20 мин кардио</li>
-              <li>Ср — Ноги + мобилити</li>
-              <li>Пт — Грудь + руки</li>
+              {WORKOUT_DAYS.map(([day, task]) => (
+                <li key={day}><strong>{day}:</strong> {task}</li>
+              ))}
             </ul>
           </article>
           <article className="home-tile">
             <h3>Фокус по питанию</h3>
             <ul>
-              <li>Калории: 2200 ккал</li>
-              <li>Белки: 160 г</li>
-              <li>Вода: 2.4 л</li>
+              {FOOD_PLAN.map(([name, value]) => (
+                <li key={name}><strong>{name}:</strong> {value}</li>
+              ))}
             </ul>
           </article>
         </div>
@@ -100,6 +121,28 @@ function HomePage({ navigate }) {
             <p>Наглядная динамика веса, объёмов и тренировочной нагрузки.</p>
           </article>
         </div>
+
+        <section className="home-news">
+          <h2>Новости и обновления</h2>
+          <div className="news-grid">
+            {NEWS.map((item) => (
+              <article key={item.title} className="news-card">
+                <h3>{item.title}</h3>
+                <p>{item.text}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="home-faq">
+          <h2>Как начать</h2>
+          <ol>
+            <li>Заполни профиль (рост, вес, цель).</li>
+            <li>Собери недельный план тренировок.</li>
+            <li>Следи за питанием и дневной нормой воды.</li>
+            <li>Раз в неделю проверяй прогресс и корректируй план.</li>
+          </ol>
+        </section>
       </div>
     </section>
   )
@@ -107,7 +150,7 @@ function HomePage({ navigate }) {
 
 function ProfilePage() {
   return (
-    <section className="card">
+    <section className="card profile-page">
       <div className="profile-head">
         <div className="avatar">A</div>
         <div>
@@ -117,30 +160,31 @@ function ProfilePage() {
       </div>
 
       <div className="profile-grid">
-        <div className="profile-item">
-          <span>Имя</span>
-          <strong>Алексей Иванов</strong>
-        </div>
-        <div className="profile-item">
-          <span>Email</span>
-          <strong>alex@ldo.local</strong>
-        </div>
-        <div className="profile-item">
-          <span>Рост</span>
-          <strong>182 см</strong>
-        </div>
-        <div className="profile-item">
-          <span>Вес</span>
-          <strong>79 кг</strong>
-        </div>
-        <div className="profile-item">
-          <span>Цель</span>
-          <strong>Снижение веса</strong>
-        </div>
-        <div className="profile-item">
-          <span>Активность</span>
-          <strong>Средняя</strong>
-        </div>
+        <div className="profile-item"><span>Имя</span><strong>Алексей Иванов</strong></div>
+        <div className="profile-item"><span>Email</span><strong>alex@ldo.local</strong></div>
+        <div className="profile-item"><span>Рост</span><strong>182 см</strong></div>
+        <div className="profile-item"><span>Вес</span><strong>79 кг</strong></div>
+        <div className="profile-item"><span>Цель</span><strong>Снижение веса</strong></div>
+        <div className="profile-item"><span>Активность</span><strong>Средняя</strong></div>
+      </div>
+
+      <div className="profile-sections">
+        <article className="profile-panel">
+          <h3>Мои цели на месяц</h3>
+          <ul>
+            <li>Стабильный дефицит 250–350 ккал</li>
+            <li>12 тренировок в месяц</li>
+            <li>Не менее 8 000 шагов в день</li>
+          </ul>
+        </article>
+        <article className="profile-panel">
+          <h3>Личные рекорды</h3>
+          <ul>
+            <li>Присед: 100 кг × 5</li>
+            <li>Жим лёжа: 80 кг × 6</li>
+            <li>Планка: 3:15</li>
+          </ul>
+        </article>
       </div>
     </section>
   )
