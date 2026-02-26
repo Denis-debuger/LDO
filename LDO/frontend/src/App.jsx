@@ -33,25 +33,71 @@ function Layout({ route, navigate, children }) {
   )
 }
 
-function HomePage() {
+function HomePage({ navigate }) {
   return (
-    <section className="card hero-card">
-      <div className="hero-content">
-        <p className="badge">LDO • FITNESS PLATFORM</p>
-        <h1>Главная страница</h1>
-        <p className="lead">Тренировки, питание и прогресс в одном месте. Это типовая статическая главная страница проекта в стиле LDO.</p>
-        <div className="hero-grid">
+    <section className="home-wrap">
+      <div className="home-shell card">
+        <div className="home-topline">Твой ежедневный фитнес-помощник: тренировки, питание, восстановление</div>
+
+        <div className="home-categories">
+          <div className="home-tabs">
+            <button type="button" className="home-tab is-active">Тренировки</button>
+            <button type="button" className="home-tab">Питание</button>
+            <button type="button" className="home-tab">Прогресс</button>
+            <button type="button" className="home-tab">Привычки</button>
+          </div>
+          <div className="home-icons">
+            <span>RU</span>
+            <span>📊</span>
+            <span>🧠</span>
+            <span>💪</span>
+          </div>
+        </div>
+
+        <div className="home-hero-card">
+          <div className="home-hero-overlay" />
+          <div className="home-hero-content">
+            <p className="badge">LDO • FITNESS PLATFORM</p>
+            <h1>BLACKOUT MODE</h1>
+            <p className="lead">Собери свой режим: планируй тренировки, считай КБЖУ и отслеживай результат каждую неделю.</p>
+            <div className="home-actions">
+              <button type="button" className="btn btn-primary" onClick={() => navigate('profile')}>Открыть профиль</button>
+              <button type="button" className="btn btn-ghost">Рассчитать КБЖУ</button>
+            </div>
+          </div>
+        </div>
+
+        <div className="home-tiles">
+          <article className="home-tile">
+            <h3>План на неделю</h3>
+            <ul>
+              <li>Пн — Спина + 20 мин кардио</li>
+              <li>Ср — Ноги + мобилити</li>
+              <li>Пт — Грудь + руки</li>
+            </ul>
+          </article>
+          <article className="home-tile">
+            <h3>Фокус по питанию</h3>
+            <ul>
+              <li>Калории: 2200 ккал</li>
+              <li>Белки: 160 г</li>
+              <li>Вода: 2.4 л</li>
+            </ul>
+          </article>
+        </div>
+
+        <div className="hero-grid section-spacer">
           <article className="mini-card">
             <h3>Тренировки</h3>
-            <p>Подбор программ и упражнений для любой цели.</p>
+            <p>Подбор программ и упражнений для любой цели: снижение веса, тонус, набор массы.</p>
           </article>
           <article className="mini-card">
             <h3>Питание</h3>
-            <p>Контроль КБЖУ и пищевых привычек.</p>
+            <p>Контроль КБЖУ и пищевых привычек без лишней рутины.</p>
           </article>
           <article className="mini-card">
             <h3>Прогресс</h3>
-            <p>Наглядная динамика результатов.</p>
+            <p>Наглядная динамика веса, объёмов и тренировочной нагрузки.</p>
           </article>
         </div>
       </div>
@@ -105,7 +151,7 @@ function App() {
 
   return (
     <Layout route={route} navigate={navigate}>
-      {route === 'profile' ? <ProfilePage /> : <HomePage />}
+      {route === 'profile' ? <ProfilePage /> : <HomePage navigate={navigate} />}
     </Layout>
   )
 }
