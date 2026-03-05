@@ -11,13 +11,15 @@
   <?php else: ?>
   <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(300px,1fr))">
     <?php foreach ($articles as $a): ?>
-    <a href="<?= url('article', ['slug' => $a['slug']]) ?>" class="card card-accent" style="display:block">
+    <?php $articleLink = ($a['slug'] ?? '') === '#' ? '#' : url('article', ['slug' => $a['slug']]); ?>
+    <a href="<?= e($articleLink) ?>" class="card card-accent" style="display:block">
       <div class="card-body">
         <h2 class="card-title"><?= e($a['title']) ?></h2>
         <?php if (!empty($a['category_name'])): ?>
         <span class="pill" style="margin-bottom:8px;display:inline-block"><?= e($a['category_name']) ?></span>
         <?php endif; ?>
         <p class="muted" style="font-size:14px"><?= e(mb_substr($a['excerpt'] ?? $a['title'], 0, 120)) ?>…</p>
+        <?php if (($a['slug'] ?? '') === '#'): ?><p class="muted" style="font-size:12px;margin-top:6px">Демо-материал: добавьте статью в админ-панели для публикации.</p><?php endif; ?>
       </div>
     </a>
     <?php endforeach; ?>
